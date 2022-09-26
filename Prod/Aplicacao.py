@@ -1,0 +1,26 @@
+import sys
+from Subcamada import Subcamada
+from Quadro import Quadro
+import logging  # https://realpython.com/python-logging/
+
+
+class Aplicacao(Subcamada):
+
+    def __init__(self):
+        Subcamada.__init__(self, sys.stdin, 3)
+        self.disable_timeout()
+        logging.basicConfig(level=logging.DEBUG)  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+
+    def recebe(self, quadro):
+        logging.info('App.recebe(): Chegou aqui')
+        print('> ' + quadro.dados.decode('ascii'))
+
+    def handle(self):
+        msg = sys.stdin.readline()[:-1]
+        dados = msg.encode('ascii')
+
+        while len(dados) > 0:
+            quadro = Quadro()
+            quadro.dados = dados[0:128]
+            self.lower.envia(quadro)
+            dados = dados[1024:]
