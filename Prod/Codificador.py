@@ -34,13 +34,23 @@ class Codificador(Subcamada):
         self.byte_count = 0  # aponta em qual byte estamos lendo na sequencia
         self.bit_count = 0  # aponta em qual bit estamos lendo na sequencia de bytes
 
-    def recebe(self, quadro):
+    def envia(self, quadro):
+        self.bit_count = 0
+        self.byte_count = 0
         self.set_initial_state(quadro)
-        self.handle_mef(quadro)
+
+        while self.bit_count < (len(quadro.data) * 8):
+            self.handle_mef(quadro)
+
+        # TODO ajustar aqui
+        # self.lower.envia(self.buffer)
+        print(self.buffer)
+        self.buffer = []
 
     def set_initial_state(self, quadro):
-        first_bit = ByteUtils.get_bit(quadro.data[0], 7)
-        second_bit = ByteUtils.get_bit(quadro.data[0], 6)
+        bits = self.next_two_bits(quadro)
+        first_bit = bits[0]
+        second_bit = bits[1]
 
         if first_bit == 0:
             if second_bit == 0:
@@ -53,60 +63,171 @@ class Codificador(Subcamada):
             else:
                 self.state = State.f4
 
+    def set_next_state(self, bits):
+        first_bit = bits[0]
+        second_bit = bits[1]
+        if self.state == State.f1:
+            if first_bit == 0:
+                if second_bit == 0:
+                    self.state = State.f5
+                else:
+                    self.state = State.f2
+            else:
+                if second_bit == 0:
+                    self.state = State.f3
+                else:
+                    self.state = State.f4
+        elif self.state == State.f2:
+            if first_bit == 0:
+                if second_bit == 0:
+                    self.state = State.f1
+                else:
+                    self.state = State.f6
+            else:
+                if second_bit == 0:
+                    self.state = State.f3
+                else:
+                    self.state = State.f4
+        elif self.state == State.f3:
+            if first_bit == 0:
+                if second_bit == 0:
+                    self.state = State.f1
+                else:
+                    self.state = State.f2
+            else:
+                if second_bit == 0:
+                    self.state = State.f7
+                else:
+                    self.state = State.f4
+        elif self.state == State.f4:
+            if first_bit == 0:
+                if second_bit == 0:
+                    self.state = State.f1
+                else:
+                    self.state = State.f2
+            else:
+                if second_bit == 0:
+                    self.state = State.f3
+                else:
+                    self.state = State.f8
+        elif self.state == State.f5:
+            if first_bit == 0:
+                if second_bit == 0:
+                    self.state = State.f1
+                else:
+                    self.state = State.f6
+            else:
+                if second_bit == 0:
+                    self.state = State.f7
+                else:
+                    self.state = State.f8
+        elif self.state == State.f6:
+            if first_bit == 0:
+                if second_bit == 0:
+                    self.state = State.f5
+                else:
+                    self.state = State.f2
+            else:
+                if second_bit == 0:
+                    self.state = State.f7
+                else:
+                    self.state = State.f8
+        elif self.state == State.f7:
+            if first_bit == 0:
+                if second_bit == 0:
+                    self.state = State.f5
+                else:
+                    self.state = State.f6
+            else:
+                if second_bit == 0:
+                    self.state = State.f3
+                else:
+                    self.state = State.f8
+        elif self.state == State.f8:
+            if first_bit == 0:
+                if second_bit == 0:
+                    self.state = State.f5
+                else:
+                    self.state = State.f6
+            else:
+                if second_bit == 0:
+                    self.state = State.f7
+                else:
+                    self.state = State.f4
+
     def handle_mef(self, quadro):
         current_dealer = self.dealers[self.state]
         return current_dealer(quadro)
 
     def next_two_bits(self, quadro):
         self.byte_count = self.bit_count // 8
-        bit_counter = self.bit_count % 8
+        bit_count = self.bit_count % 8
 
-        first_bit = ByteUtils.get_bit(quadro.data[self.byte_count])
-        second_bit = ByteUtils.get_bit(quadro.data[self.byte_count])
+        first_bit = ByteUtils.get_bit(quadro.data[self.byte_count], bit_count)
+        second_bit = ByteUtils.get_bit(quadro.data[self.byte_count], bit_count)
 
-        return [first_bit, second_bit]
+        return first_bit, second_bit
 
     def f1(self, quadro):
         self.buffer.append(0)
         self.buffer.append(0)
 
         self.bit_count += 2
-        self.next_state(quadro)
-
-        # TODO aqui falta fazer mt coisa ainda
-
+        next_two_bits = self.next_two_bits(quadro)
+        self.set_next_state(next_two_bits)
 
     def f2(self, quadro):
         self.buffer.append(0)
         self.buffer.append(1)
-        pass
+
+        self.bit_count += 2
+        next_two_bits = self.next_two_bits(quadro)
+        self.set_next_state(next_two_bits)
 
     def f3(self, quadro):
         self.buffer.append(1)
         self.buffer.append(0)
-        pass
+
+        self.bit_count += 2
+        next_two_bits = self.next_two_bits(quadro)
+        self.set_next_state(next_two_bits)
 
     def f4(self, quadro):
         self.buffer.append(1)
         self.buffer.append(1)
-        pass
+
+        self.bit_count += 2
+        next_two_bits = self.next_two_bits(quadro)
+        self.set_next_state(next_two_bits)
 
     def f5(self, quadro):
         self.buffer.append(0)
         self.buffer.append(0)
-        pass
+
+        self.bit_count += 2
+        next_two_bits = self.next_two_bits(quadro)
+        self.set_next_state(next_two_bits)
 
     def f6(self, quadro):
         self.buffer.append(0)
         self.buffer.append(1)
-        pass
+
+        self.bit_count += 2
+        next_two_bits = self.next_two_bits(quadro)
+        self.set_next_state(next_two_bits)
 
     def f7(self, quadro):
         self.buffer.append(1)
         self.buffer.append(0)
-        pass
+
+        self.bit_count += 2
+        next_two_bits = self.next_two_bits(quadro)
+        self.set_next_state(next_two_bits)
 
     def f8(self, quadro):
         self.buffer.append(1)
         self.buffer.append(1)
-        pass
+
+        self.bit_count += 2
+        next_two_bits = self.next_two_bits(quadro)
+        self.set_next_state(next_two_bits)
