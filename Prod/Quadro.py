@@ -5,3 +5,4 @@ class Quadro:
         self.freq_seq = []
         self.n_bytes = len(self.data)
         self.n_bits = self.n_bytes * 8
+
