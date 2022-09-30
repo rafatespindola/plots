@@ -2,6 +2,7 @@ import logging
 # from serial import Serial
 from Aplicacao import Aplicacao
 from Codificador import Codificador
+from Trasmissor import Transmissor
 import poller
 import sys
 
@@ -17,12 +18,14 @@ if __name__ == '__main__':
     # ses = Sessao(5)
     app = Aplicacao()
     cod = Codificador()
+    tms = Transmissor()
 
     # Connect layers. The lower connects to upper
     # enq.conecta(arq)
     # arq.conecta(ses)
     # ses.conecta(app)
     cod.conecta(app)
+    tms.conecta(cod)
 
     # Create Poller
     sched = poller.Poller()

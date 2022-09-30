@@ -9,7 +9,7 @@ class Aplicacao(Subcamada):
     def __init__(self):
         Subcamada.__init__(self, sys.stdin, 3)
         self.disable_timeout()
-        logging.basicConfig(level=logging.INFO)  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+        logging.basicConfig(level=logging.WARNING)  # DEBUG, INFO, WARNING, ERROR, CRITICAL
 
     def recebe(self, quadro):
         logging.info('App.recebe(): Chegou aqui')

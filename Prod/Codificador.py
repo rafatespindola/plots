@@ -38,6 +38,7 @@ class Codificador(Subcamada):
         logging.basicConfig(level=logging.INFO)  # DEBUG, INFO, WARNING, ERROR, CRITICAL
 
     def envia(self, quadro):
+        self.buffer = []
         self.bit_count = 0
         self.byte_count = 0
         self.set_initial_state(quadro)
@@ -48,10 +49,9 @@ class Codificador(Subcamada):
             logging.info('Cod.envia: State: ' + str(self.state))
             self.handle_mef(quadro)
 
-        # TODO ajustar aqui
-        # self.lower.envia(self.buffer)
         print(self.buffer)
-        self.buffer = []
+        quadro.freq_seq = self.buffer
+        self.lower.envia(quadro)
 
     def set_initial_state(self, quadro):
         bits = self.next_two_bits(quadro)
@@ -183,35 +183,35 @@ class Codificador(Subcamada):
         return first_bit, second_bit
 
     def f1(self, quadro):
-        self.buffer.append(State.f1)
+        self.buffer.append(0)
         self.next_step_mef(quadro)
 
     def f2(self, quadro):
-        self.buffer.append(State.f2)
+        self.buffer.append(1)
         self.next_step_mef(quadro)
 
     def f3(self, quadro):
-        self.buffer.append(State.f3)
+        self.buffer.append(2)
         self.next_step_mef(quadro)
 
     def f4(self, quadro):
-        self.buffer.append(State.f4)
+        self.buffer.append(3)
         self.next_step_mef(quadro)
 
     def f5(self, quadro):
-        self.buffer.append(State.f5)
+        self.buffer.append(4)
         self.next_step_mef(quadro)
 
     def f6(self, quadro):
-        self.buffer.append(State.f6)
+        self.buffer.append(5)
         self.next_step_mef(quadro)
 
     def f7(self, quadro):
-        self.buffer.append(State.f7)
+        self.buffer.append(6)
         self.next_step_mef(quadro)
 
     def f8(self, quadro):
-        self.buffer.append(State.f8)
+        self.buffer.append(7)
         self.next_step_mef(quadro)
 
     def next_step_mef(self, quadro):
