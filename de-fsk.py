@@ -8,15 +8,15 @@ import struct
 import matplotlib.pyplot as plt
 
 
-# frequency of FSK
-frequency_list = [1000.0, 2000.0]  # Hz
-# number of symbol types. for mFSK 2 is enough.
-num_frequency = 2
-# sample duration in seconds
-duration = 0.001 # seconds
+# # frequency of FSK
+# frequency_list = [1000.0, 2000.0]  # Hz
+# # number of symbol types. for mFSK 2 is enough.
+# num_frequency = 2
+# # sample duration in seconds
+# duration = 0.001 # seconds
 
 # audio file name
-audiofilename = "test.wav"
+audiofilename = "tx_data.wav"
 
 # open audio file
 audiofile = wave.open(audiofilename, 'r')
